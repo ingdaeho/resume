@@ -5,6 +5,7 @@ import { RichText } from "prismic-reactjs"
 import { graphql, Link } from "gatsby"
 import styled from "@emotion/styled"
 import colors from "styles/colors"
+import ReactMarkdown from "react-markdown"
 import dimensions from "styles/dimensions"
 import Button from "components/_ui/Button"
 import About from "components/About"
@@ -22,7 +23,8 @@ const Hero = styled("div")`
   }
 
   h1 {
-    margin-bottom: 1em;
+    margin-block-start: 0;
+    margin-block-end: 0;
 
     a {
       text-decoration: none;
@@ -117,77 +119,81 @@ const WorkAction = styled(Link)`
   }
 `
 
-const RenderBody = ({ home, projects, meta }) => (
-  <>
-    <Helmet
-      title={`Home`}
-      titleTemplate={`%s | 임대호`}
-      meta={[
-        {
-          name: `description`,
-          content: meta.description,
-        },
-        {
-          property: `og:title`,
-          content: meta.title,
-        },
-        {
-          property: `og:description`,
-          content: meta.description,
-        },
-        {
-          property: `og:type`,
-          content: `website`,
-        },
-        {
-          name: `twitter:card`,
-          content: `summary`,
-        },
-        {
-          name: `twitter:creator`,
-          content: meta.author,
-        },
-        {
-          name: `twitter:title`,
-          content: meta.title,
-        },
-        {
-          name: `twitter:description`,
-          content: meta.description,
-        },
-      ].concat(meta)}
-    />
-    <Hero>
-      <>{RichText.render(home.hero_title)}</>
-      <a
-        href={home.hero_button_link.url}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Button>{RichText.render(home.hero_button_text)}</Button>
-      </a>
-    </Hero>
-    <Section>
-      {projects.map((project, i) => (
-        <ProjectCard
-          key={i}
-          category={project.node.project_category}
-          title={project.node.project_title}
-          description={project.node.project_preview_description}
-          thumbnail={project.node.project_preview_thumbnail}
-          uid={project.node._meta.uid}
-        />
-      ))}
-      <WorkAction to={"/work"}>
-        See more work <span>&#8594;</span>
-      </WorkAction>
-    </Section>
-    <Section>
-      {RichText.render(home.about_title)}
-      <About bio={home.about_bio} socialLinks={home.about_links} />
-    </Section>
-  </>
-)
+const RenderBody = ({ home, projects, meta }) => {
+  const projectSliced = projects.slice(0, 2)
+  const markdown = RichText.asText(home.hero_title)
+  return (
+    <>
+      <Helmet
+        title={`Home`}
+        titleTemplate={`%s | 임대호`}
+        meta={[
+          {
+            name: `description`,
+            content: meta.description,
+          },
+          {
+            property: `og:title`,
+            content: meta.title,
+          },
+          {
+            property: `og:description`,
+            content: meta.description,
+          },
+          {
+            property: `og:type`,
+            content: `website`,
+          },
+          {
+            name: `twitter:card`,
+            content: `summary`,
+          },
+          {
+            name: `twitter:creator`,
+            content: meta.author,
+          },
+          {
+            name: `twitter:title`,
+            content: meta.title,
+          },
+          {
+            name: `twitter:description`,
+            content: meta.description,
+          },
+        ].concat(meta)}
+      />
+      <Hero>
+        <>
+          <ReactMarkdown source={markdown} escapeHtml={false} />
+        </>
+        <Link to="blog/resume">
+          <Button style={{ marginTop: 50 }}>
+            {RichText.render(home.hero_button_text)}
+          </Button>
+        </Link>
+      </Hero>
+      <Section>
+        {projectSliced.map((project, i) => (
+          <ProjectCard
+            key={i}
+            category={project.node.project_category}
+            title={project.node.project_title}
+            description={project.node.project_preview_description}
+            thumbnail={project.node.project_preview_thumbnail}
+            uid={project.node._meta.uid}
+          />
+        ))}
+        <WorkAction to={"/work"}>
+          See more work <span>&#8594;</span>
+        </WorkAction>
+      </Section>
+      <Section>
+        {RichText.render(home.about_title)}
+        <About bio={home.about_bio} socialLinks={home.about_links} />
+      </Section>
+    </>
+  )
+}
 
 export default ({ data }) => {
   //Required check for no data being returned
@@ -233,7 +239,7 @@ export const query = graphql`
           }
         }
       }
-      allProjects {
+      allProjects(sortBy: project_post_date_DESC) {
         edges {
           node {
             project_title
