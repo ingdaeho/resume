@@ -190,7 +190,6 @@ const PostDate = styled("div")`
 
 const Post = ({ post, meta }) => {
   const markdown = RichText.asText(post.post_body)
-
   return (
     <>
       <Helmet
