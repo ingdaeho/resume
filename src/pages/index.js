@@ -202,7 +202,6 @@ export default ({ data }) => {
   const meta = data.site.siteMetadata
 
   if (!doc || !projects) return null
-
   return (
     <Layout>
       <RenderBody home={doc.node} projects={projects} meta={meta} />
