@@ -21,6 +21,7 @@ const Hero = styled("div")`
   @media (max-width: ${dimensions.maxwidthMobile}px) {
     margin-bottom: 3em;
   }
+
   h1 {
     margin-block-start: 0;
     margin-block-end: 0;
